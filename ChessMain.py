@@ -1,13 +1,15 @@
  #Dùng pygame để tạo giao diện đồ họa   
 import pygame as p
 import ChessEngine, ChessAI #Engine : quản lý logic chess,AI: tạo nước đi cho AI
+# import bg
 import sys  
 from multiprocessing import Process, Queue
+
 
 BOARD_WIDTH = BOARD_HEIGHT = 512
 MOVE_LOG_PANEL_WIDTH = 250 # độ dài của bảng ghi chép nước đi
 MOVE_LOG_PANEL_HEIGHT = BOARD_HEIGHT
-DIMENSION = 8 # số hàng,cột trên bàn cờ
+DIMENSION = 8 #  số hàng,cột trên bàn cờ
 SQUARE_SIZE = BOARD_HEIGHT // DIMENSION
 MAX_FPS = 15
 IMAGES = {}
@@ -20,12 +22,14 @@ def loadImages():
         IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
 
 # transform.scale : điều chỉnh kích thước hình ảnh theo hình vuông 
-def main():
+def main(mode):
     """
+    if 1 chessAI = easy
     The main driver for our code.
     This will handle user input and updating the graphics.
     """
     p.init() #Khởi tạo pygame
+    p.display.set_caption("Chess Game")
     screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT)) # tạo cửa sổ trò chơi
     clock = p.time.Clock() # > kiểm soát tốc độ khung hình và thời gian
     screen.fill(p.Color("white")) #để board full white
@@ -274,4 +278,4 @@ def animateMove(move, screen, board, clock):
 
 
 if __name__ == "__main__":
-    main()
+    main(1)
