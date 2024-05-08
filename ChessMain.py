@@ -28,6 +28,11 @@ def main(mode):
     The main driver for our code.
     This will handle user input and updating the graphics.
     """
+    
+    if(mode == 1): ChessAI.DEPTH = 3
+    elif(mode == 2): ChessAI.DEPTH = 5
+    elif(mode == 3): ChessAI.DEPTH =7
+    
     p.init() #Khởi tạo pygame
     p.display.set_caption("Chess Game")
     screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT)) # tạo cửa sổ trò chơi
@@ -48,7 +53,7 @@ def main(mode):
     move_log_font = p.font.SysFont("Arial", 14, False, False)
     player_one = True  # if a human is playing white, then this will be True, else False
     player_two = False  # if a hyman is playing white, then this will be True, else False
-
+    
     while running:
         human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
         for e in p.event.get():
