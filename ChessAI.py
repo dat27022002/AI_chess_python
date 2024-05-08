@@ -98,10 +98,12 @@ def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_m
             break
     return max_score
 
-
 def scoreBoard(game_state):
     """
-    Score the board. A positive score is good for white, a negative score is good for black.
+    1. Checkmate/Stalemate: Check if the game is in checkmate or stalemate.
+    2. Material: Calculate the score based on the worth of each live piece.
+    3. Piece Mobility: The more legal moves a player in a given position has, the better.
+    4. Control of the board's center: The player who controls the center of the chessboard tends to have a better game.
     """
     if game_state.checkmate:
         if game_state.white_to_move:
@@ -109,23 +111,55 @@ def scoreBoard(game_state):
         else:
             return CHECKMATE  # white wins
     elif game_state.stalemate:
-        return STALEMATE #Hòa
-    #Chưa hiểu tạo score làm gì
-    score = 0 #Nếu không có tình huống checkmate hay stalemate thì khởi tạo score
-    for row in range(len(game_state.board)):
-        for col in range(len(game_state.board[row])):
-            piece = game_state.board[row][col]
-            if piece != "--":
-                piece_position_score = 0
-                if piece[1] != "K":
-                    piece_position_score = piece_position_scores[piece][row][col]
-                if piece[0] == "w":
-                    score += piece_score[piece[1]] + piece_position_score
-                if piece[0] == "b":
-                    score -= piece_score[piece[1]] + piece_position_score
+        return STALEMATE
 
+    score = 0
+    score += calculate_material_score(game_state.board)
+    score += calculate_mobility_score(game_state)
+    score += calculate_center_control_score(game_state.board)
     return score
 
+def calculate_material_score(board):
+    """
+    Score based on the worth of each live piece on the board.
+    """
+    material_score = 0
+    score_dict = piece_score
+    for row in range(len(board)):
+        for col in range(len(board[row])):
+            piece = board[row][col]
+            if piece != "--":
+                color,piece_type = piece[0],piece[1]
+                if color == "w":
+                    material_score += score_dict[piece_type]
+                elif color == "b":
+                    material_score -= score_dict[piece_type]
+    return material_score
+
+def calculate_mobility_score(game_state):
+    """
+    Score based on the number of legal moves a player in a given position has.
+    """
+    valid_moves = game_state.getValidMoves()
+    mobility_score = len(valid_moves)
+    return mobility_score if game_state.white_to_move else -mobility_score
+
+def calculate_center_control_score(board):
+    """
+    Score based on the control of the center of the chessboard.
+    """
+    center_control_score = 0
+    center_squares = [(3,3),(3,4),(4,3),(4,4)]
+    for square in center_squares:
+        piece = board[square[0]][square[1]]
+        if piece != "--":
+            color,piece_type = piece[0],piece[1]
+            score = 1 if piece_type == "p" else 2
+            if color == "w":
+                center_control_score += score
+            elif color == "b":
+                center_control_score -= score
+    return center_control_score
 
 def findRandomMove(valid_moves):
     """
