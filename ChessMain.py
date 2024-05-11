@@ -29,9 +29,9 @@ def main(mode):
     This will handle user input and updating the graphics.
     """
     
-    if(mode == 1): ChessAI.DEPTH = 3
-    elif(mode == 2): ChessAI.DEPTH = 5
-    elif(mode == 3): ChessAI.DEPTH =7
+    if(mode == 1): ChessAI.depthAI = 3
+    elif(mode == 2): ChessAI.depthAI = 5
+    elif(mode == 3): ChessAI.depthAI =7
     
     p.init() #Khởi tạo pygame
     p.display.set_caption("Chess Game")
