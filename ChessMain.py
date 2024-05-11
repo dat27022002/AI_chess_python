@@ -1,6 +1,7 @@
  #Dùng pygame để tạo giao diện đồ họa   
 import pygame as p
 import ChessEngine, ChessAI #Engine : quản lý logic chess,AI: tạo nước đi cho AI
+# import main as mainModule
 # import bg
 import sys  
 from multiprocessing import Process, Queue
@@ -14,6 +15,27 @@ SQUARE_SIZE = BOARD_HEIGHT // DIMENSION
 MAX_FPS = 15
 IMAGES = {}
 
+# Kích thước màn hình
+SCREEN_WIDTH = 762
+SCREEN_HEIGHT = 512
+
+# Màu sắc
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+YELLOW = (255, 255, 0)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+
+# Định nghĩa các nút
+button_width = 100  # Chiều rộng nút
+button_height = 50  # Chiều cao nút
+button_spacing = 20  # Khoảng cách giữa các nút
+
+# Tính toán vị trí giữa màn hình theo chiều ngang
+center_x = SCREEN_WIDTH // 2
+center_y = SCREEN_HEIGHT // 2
+
 
 def loadImages():
    # Hàm dùng để tải hình ảnh các quân cờ từ thư mục image có sẵn
@@ -22,12 +44,10 @@ def loadImages():
         IMAGES[piece] = p.transform.scale(p.image.load("images/" + piece + ".png"), (SQUARE_SIZE, SQUARE_SIZE))
 
 # transform.scale : điều chỉnh kích thước hình ảnh theo hình vuông 
-def main(mode):
-    """
-    if 1 chessAI = easy
-    The main driver for our code.
-    This will handle user input and updating the graphics.
-    """
+def ChessMain(mode):
+    
+
+
     
     p.init() #Khởi tạo pygame
     p.display.set_caption("Chess Game")
@@ -50,6 +70,10 @@ def main(mode):
     player_one = True  # if a human is playing white, then this will be True, else False
     player_two = False  # if a hyman is playing white, then this will be True, else False
     
+    # restart btn pos
+    restartBtn = p.Rect(BOARD_WIDTH + (MOVE_LOG_PANEL_WIDTH - button_width)/2, center_y, button_width, button_height)
+    
+
     while running:
         human_turn = (game_state.white_to_move and player_one) or (not game_state.white_to_move and player_two)
         for e in p.event.get():
@@ -79,6 +103,9 @@ def main(mode):
                                 player_clicks = []
                         if not move_made:
                             player_clicks = [square_selected]
+                else:
+                    if restartBtn.collidepoint(e.pos):
+                        main()
 
             # key handler
             elif e.type == p.KEYDOWN:
@@ -133,6 +160,7 @@ def main(mode):
 
         if not game_over:
             drawMoveLog(screen, game_state, move_log_font)
+            
 
         if game_state.checkmate:
             game_over = True
@@ -140,10 +168,15 @@ def main(mode):
                 drawEndGameText(screen, "Black wins by checkmate")
             else:
                 drawEndGameText(screen, "White wins by checkmate")
+            draw_button(screen, BLUE, restartBtn, 'Restart')
 
         elif game_state.stalemate:
             game_over = True
-            drawEndGameText(screen, "Stalemate")
+            if game_state.white_to_move:
+                drawEndGameText(screen, "Black wins by Stalemate")
+            else:
+                drawEndGameText(screen, "White wins by Stalemate")
+            draw_button(screen, BLUE, restartBtn, 'Restart')
 
         clock.tick(MAX_FPS)
         p.display.flip()
@@ -278,5 +311,58 @@ def animateMove(move, screen, board, clock):
         clock.tick(60)
 
 
+def draw_button(screen, color, rect, text):
+    p.draw.rect(screen, color, rect)  # Vẽ nút
+    font = p.font.Font(None, 36)  # Chọn font chữ
+    text_surface = font.render(text, True, BLACK)  # Tạo text cho nút
+    text_rect = text_surface.get_rect(center=rect.center)  # Định vị text trên nút
+    screen.blit(text_surface, text_rect)  # Vẽ text trên nút
+
+# Hàm chính
+def main():
+    p.init()  # Khởi tạo Pygame
+    p.display.set_caption("Chess Game")
+    screen = p.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # Tạo màn hình
+    running = True
+    
+    # Tải hình ảnh nền
+    background_image = p.image.load("bg.jpg")
+    background_rect = background_image.get_rect()
+        
+    
+
+    # Đặt các nút ở giữa màn hình, với khoảng cách giữa chúng
+    easy_btn = p.Rect(center_x - (1.5 * (button_width + button_spacing)), center_y, button_width, button_height)
+    normal_btn = p.Rect(center_x - (0.5 * (button_width + button_spacing)), center_y, button_width, button_height)
+    hard_btn = p.Rect(center_x + (0.5 * (button_width + button_spacing)), center_y, button_width, button_height)
+
+    while running:
+        for event in p.event.get():
+            if event.type == p.QUIT:  # Thoát khi nhấn nút đóng cửa sổ
+                running = False
+            elif event.type == p.MOUSEBUTTONDOWN:  # Xử lý nhấp chuột
+                if easy_btn.collidepoint(event.pos):
+                    ChessMain(1)
+                    print("Easy mode selected")  # Gọi hàm hoặc thiết lập cho easy mode
+                elif normal_btn.collidepoint(event.pos):
+                    ChessMain(2)
+                    print("Normal mode selected")  # Gọi hàm hoặc thiết lập cho normal mode
+                elif hard_btn.collidepoint(event.pos):
+                    ChessMain(3)
+                    print("Hard mode selected")  # Gọi hàm hoặc thiết lập cho hard mode
+
+        # Vẽ nền trắng
+        screen.blit(background_image, background_rect)
+
+        # Vẽ ba nút
+        draw_button(screen, GREEN, easy_btn, "Easy")
+        draw_button(screen, YELLOW, normal_btn, "Normal")
+        draw_button(screen, RED, hard_btn, "Hard")
+
+        # Cập nhật màn hình
+        p.display.flip()
+
+    p.quit()  # Thoát Pygame
+
 if __name__ == "__main__":
-    main(1)
+    main()

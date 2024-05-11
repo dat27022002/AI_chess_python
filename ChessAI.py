@@ -71,11 +71,13 @@ def findBestMove(game_state, valid_moves, return_queue, mode):
     global next_move
     global depthAI
     if mode == 1:
-        depthAI = 3
+        depthAI = 2
     elif mode == 2:
-        depthAI = 5
+        depthAI = 3
     elif mode == 3:
-        depthAI = 7
+        depthAI = 4
+    else:
+        depthAI = 2
     next_move = None
     random.shuffle(valid_moves)
     findMoveNegaMaxAlphaBeta(game_state, valid_moves, depthAI, -CHECKMATE, CHECKMATE,
