@@ -65,11 +65,17 @@ piece_position_scores = {"wN": knight_scores,
 
 CHECKMATE = 1000
 STALEMATE = 0
-depthAI = 3
 
 
-def findBestMove(game_state, valid_moves, return_queue):
+def findBestMove(game_state, valid_moves, return_queue, mode):
     global next_move
+    global depthAI
+    if mode == 1:
+        depthAI = 3
+    elif mode == 2:
+        depthAI = 5
+    elif mode == 3:
+        depthAI = 7
     next_move = None
     random.shuffle(valid_moves)
     findMoveNegaMaxAlphaBeta(game_state, valid_moves, depthAI, -CHECKMATE, CHECKMATE,
@@ -89,6 +95,7 @@ def findMoveNegaMaxAlphaBeta(game_state, valid_moves, depth, alpha, beta, turn_m
         score = -findMoveNegaMaxAlphaBeta(game_state, next_moves, depth - 1, -beta, -alpha, -turn_multiplier)
         if score > max_score:
             max_score = score
+            print(depthAI,depth)
             if depth == depthAI:
                 next_move = move
         game_state.undoMove()

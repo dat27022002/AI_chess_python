@@ -29,10 +29,6 @@ def main(mode):
     This will handle user input and updating the graphics.
     """
     
-    if(mode == 1): ChessAI.depthAI = 3
-    elif(mode == 2): ChessAI.depthAI = 5
-    elif(mode == 3): ChessAI.depthAI =7
-    
     p.init() #Khởi tạo pygame
     p.display.set_caption("Chess Game")
     screen = p.display.set_mode((BOARD_WIDTH + MOVE_LOG_PANEL_WIDTH, BOARD_HEIGHT)) # tạo cửa sổ trò chơi
@@ -113,7 +109,7 @@ def main(mode):
             if not ai_thinking:
                 ai_thinking = True
                 return_queue = Queue()  # used to pass data between threads
-                move_finder_process = Process(target=ChessAI.findBestMove, args=(game_state, valid_moves, return_queue))
+                move_finder_process = Process(target=ChessAI.findBestMove, args=(game_state, valid_moves, return_queue,mode))
                 move_finder_process.start()
 
             if not move_finder_process.is_alive():
